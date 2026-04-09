@@ -11,7 +11,8 @@ import {
   Utensils,
   Play,
   Bus,
-  Settings
+  Settings,
+  Trash2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
@@ -47,6 +48,8 @@ export default function App() {
     },
     metas: []
   });
+
+  const [history, setHistory] = useState<Transaction[]>([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pendingTx, setPendingTx] = useState({
@@ -92,6 +95,8 @@ export default function App() {
           }
         }
       });
+      // Sort history descending by date and save
+      setHistory(transactions.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
     }
     setData(newState);
     setLoading(false);
@@ -120,12 +125,26 @@ export default function App() {
     }
   };
 
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!window.confirm("¿Seguro que quieres eliminar este registro?")) return;
+    
+    setLoading(true);
+    const { error } = await supabase.from('transactions').delete().eq('id', id);
+    if (error) {
+      alert("Error al eliminar: " + error.message);
+      setLoading(false);
+    } else {
+      fetchData();
+    }
+  };
+
   const openQuickAction = (type: TransactionType) => {
     setPendingTx({ ...pendingTx, tipo: type });
     setIsModalOpen(true);
   };
 
-  if (loading) {
+  if (loading && !data.ingresos && !data.gastos) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <motion.div 
@@ -218,6 +237,55 @@ export default function App() {
                  <CategoryItem icon={<CreditCard />} label="Apps" value={data.categories.suscripciones} />
               </div>
            </div>
+        </section>
+
+        {/* Transaction History */}
+        <section className="premium-card">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-bold">Historial de Movimientos</h3>
+            <span className="text-xs font-bold uppercase tracking-widest text-slate-500">{history.length} Registros</span>
+          </div>
+          
+          <div className="space-y-3">
+            {history.length === 0 ? (
+              <p className="text-center text-slate-500 py-6 text-sm">No hay movimientos recientes.</p>
+            ) : (
+              history.map((tx) => (
+                <div key={tx.id} className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group">
+                  <div className="flex items-center gap-4">
+                     <div className={cn(
+                       "w-10 h-10 rounded-full flex items-center justify-center",
+                       tx.tipo === 'ingreso_mensual' || tx.tipo === 'deposito_fondos' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'
+                     )}>
+                       {tx.tipo === 'ingreso_mensual' || tx.tipo === 'deposito_fondos' ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
+                     </div>
+                     <div>
+                       <div className="font-bold text-sm uppercase tracking-wide">
+                         {tx.tipo.replace('_', ' ')}
+                         {tx.categoria && <span className="text-slate-400 ml-2 text-xs">({tx.categoria})</span>}
+                       </div>
+                       <div className="text-xs text-slate-500">{new Date(tx.created_at).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</div>
+                     </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className={cn(
+                      "font-black text-lg",
+                      tx.tipo === 'ingreso_mensual' || tx.tipo === 'deposito_fondos' ? "text-emerald-400" : "text-rose-400"
+                    )}>
+                      {tx.tipo === 'ingreso_mensual' || tx.tipo === 'deposito_fondos' ? '+' : '-'}${Number(tx.monto).toLocaleString('es-AR')} <span className="text-xs">{tx.moneda.toUpperCase()}</span>
+                    </div>
+                    <button 
+                      onClick={(e) => handleDelete(tx.id, e)}
+                      className="text-slate-500 hover:text-rose-400 bg-black/20 p-2 rounded-xl opacity-0 group-hover:opacity-100 transition-all active:scale-95"
+                      title="Eliminar registro"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </section>
       </main>
 
