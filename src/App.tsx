@@ -5,8 +5,6 @@ import {
   TrendingUp, 
   TrendingDown, 
   Wallet, 
-  DollarSign, 
-  ArrowUpRight, 
   X,
   CreditCard,
   Home,
@@ -18,7 +16,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { Transaction, TransactionType, Currency, Category, Meta } from './types';
+import type { Transaction, TransactionType, Currency, Category, Meta } from './types';
 
 // Utility for tailwind classes
 function cn(...inputs: ClassValue[]) {
@@ -51,7 +49,6 @@ export default function App() {
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<TransactionType>('ingreso_mensual');
   const [pendingTx, setPendingTx] = useState({
     tipo: 'ingreso_mensual' as TransactionType,
     moneda: 'ars' as Currency,
