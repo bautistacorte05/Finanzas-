@@ -12,11 +12,13 @@ import {
   Play,
   Bus,
   Settings,
-  Trash2
+  Trash2,
+  LogOut
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import Auth from './Auth';
 import type { Transaction, TransactionType, Currency, Category, Meta } from './types';
 
 // Utility for tailwind classes
@@ -26,6 +28,7 @@ function cn(...inputs: ClassValue[]) {
 
 export default function App() {
   const [loading, setLoading] = useState(true);
+  const [session, setSession] = useState<any>(null);
   const [data, setData] = useState<{
     ars: number;
     usd: number;
@@ -102,7 +105,23 @@ export default function App() {
   };
 
   useEffect(() => {
-    fetchData();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session) {
+        fetchData();
+      } else {
+        setLoading(false);
+      }
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session) fetchData();
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleSave = async () => {
@@ -143,6 +162,10 @@ export default function App() {
     setIsModalOpen(true);
   };
 
+  if (!session && !loading) {
+    return <Auth />;
+  }
+
   if (loading && !data.ingresos && !data.gastos) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -167,15 +190,27 @@ export default function App() {
           <p className="text-slate-400 text-sm mt-1 uppercase tracking-widest font-medium">Panel de Gestión Privada</p>
         </div>
         
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => openQuickAction('ingreso_mensual')}
-          className="btn-primary flex items-center gap-2 group"
-        >
-          <Plus size={18} className="group-hover:rotate-90 transition-transform" />
-          Cargar Ingreso Mensual
-        </motion.button>
+        <div className="flex items-center gap-3">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => supabase.auth.signOut()}
+            className="flex items-center justify-center p-3 bg-rose-500/10 text-rose-400 rounded-2xl hover:bg-rose-500/20 transition-colors"
+            title="Cerrar Sesión"
+          >
+            <LogOut size={18} />
+          </motion.button>
+          
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => openQuickAction('ingreso_mensual')}
+            className="btn-primary flex items-center gap-2 group"
+          >
+            <Plus size={18} className="group-hover:rotate-90 transition-transform" />
+            <span className="hidden sm:inline">Cargar Ingreso</span>
+          </motion.button>
+        </div>
       </header>
 
       <main className="max-w-6xl mx-auto space-y-12">
