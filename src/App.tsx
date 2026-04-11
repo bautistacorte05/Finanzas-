@@ -88,7 +88,6 @@ export default function App() {
         } else if (tx.tipo === 'deposito_fondos') {
           newState[tx.moneda] += monto;
         } else if (tx.tipo === 'gasto') {
-          newState[tx.moneda] -= monto;
           if (tx.moneda === 'ars' && tx.categoria && tx.categoria !== 'meta_contribution') {
             newState.gastos += monto;
             newState.categories[tx.categoria] += monto;
