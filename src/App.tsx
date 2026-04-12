@@ -6,7 +6,6 @@ import {
   TrendingDown, 
   Wallet, 
   X,
-  CreditCard,
   Home,
   Utensils,
   Play,
