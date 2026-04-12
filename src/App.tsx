@@ -13,7 +13,9 @@ import {
   Bus,
   Settings,
   Trash2,
-  LogOut
+  LogOut,
+  Brain,
+  User
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
@@ -46,7 +48,8 @@ export default function App() {
       comida: 0,
       entretenimiento: 0,
       transporte: 0,
-      suscripciones: 0,
+      psicologa: 0,
+      fernando: 0,
       meta_contribution: 0
     },
     metas: []
@@ -77,7 +80,8 @@ export default function App() {
         comida: 0,
         entretenimiento: 0,
         transporte: 0,
-        suscripciones: 0,
+        psicologa: 0,
+        fernando: 0,
         meta_contribution: 0
       },
       metas: (metas || []) as Meta[]
@@ -263,12 +267,13 @@ export default function App() {
                 <h3 className="text-xl font-bold">Desglose de Gastos (ARS)</h3>
                 <Settings size={18} className="text-slate-500 cursor-pointer hover:text-white transition-colors" />
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-center">
                  <CategoryItem icon={<Home />} label="Alquiler" value={data.categories.alquiler} />
                  <CategoryItem icon={<Utensils />} label="Comida" value={data.categories.comida} />
                  <CategoryItem icon={<Play />} label="Ocio" value={data.categories.entretenimiento} />
                  <CategoryItem icon={<Bus />} label="Viajes" value={data.categories.transporte} />
-                 <CategoryItem icon={<CreditCard />} label="Apps" value={data.categories.suscripciones} />
+                 <CategoryItem icon={<Brain />} label="Psicóloga" value={data.categories.psicologa} />
+                 <CategoryItem icon={<User />} label="Fernando" value={data.categories.fernando} />
               </div>
            </div>
         </section>
@@ -387,7 +392,8 @@ export default function App() {
                         <option value="comida">Comida</option>
                         <option value="entretenimiento">Ocio</option>
                         <option value="transporte">Viajes</option>
-                        <option value="suscripciones">Suscripciones</option>
+                        <option value="psicologa">Psicóloga</option>
+                        <option value="fernando">Fernando</option>
                       </select>
                     </div>
                   )}
