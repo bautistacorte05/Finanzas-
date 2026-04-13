@@ -234,7 +234,7 @@ export default function App() {
           />
           <StatCard 
             title="Balance Neto" 
-            value={Math.max(0, data.ingresos - data.gastos)} 
+            value={Math.max(0, data.ingresos - data.gastos - data.ars)} 
             icon={<Wallet className="text-indigo-400" />} 
             color="indigo"
           />
