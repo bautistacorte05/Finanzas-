@@ -35,6 +35,7 @@ export default function App() {
     usd: number;
     ingresos: number;
     gastos: number;
+    ahorros_mes_ars: number;
     categories: Record<Category, number>;
     metas: Meta[];
   }>({
@@ -42,6 +43,7 @@ export default function App() {
     usd: 0,
     ingresos: 0,
     gastos: 0,
+    ahorros_mes_ars: 0,
     categories: {
       alquiler: 0,
       comida: 0,
@@ -74,6 +76,7 @@ export default function App() {
       usd: 0,
       ingresos: 0,
       gastos: 0,
+      ahorros_mes_ars: 0,
       categories: {
         alquiler: 0,
         comida: 0,
@@ -86,17 +89,33 @@ export default function App() {
       metas: (metas || []) as Meta[]
     };
 
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
     if (transactions) {
       transactions.forEach((tx: Transaction) => {
         const monto = Number(tx.monto);
-        if (tx.tipo === 'ingreso_mensual') {
-          if (tx.moneda === 'ars') newState.ingresos += monto;
-        } else if (tx.tipo === 'deposito_fondos') {
+        const txDate = new Date(tx.created_at);
+        const isCurrentMonth = txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear;
+
+        if (tx.tipo === 'deposito_fondos') {
           newState[tx.moneda] += monto;
-        } else if (tx.tipo === 'gasto') {
-          if (tx.moneda === 'ars' && tx.categoria && tx.categoria !== 'meta_contribution') {
-            newState.gastos += monto;
-            newState.categories[tx.categoria] += monto;
+          if (isCurrentMonth && tx.moneda === 'ars') {
+            newState.ahorros_mes_ars += monto;
+          }
+        }
+
+        if (isCurrentMonth) {
+          if (tx.tipo === 'ingreso_mensual') {
+            if (tx.moneda === 'ars') newState.ingresos += monto;
+          } else if (tx.tipo === 'gasto') {
+            if (tx.moneda === 'ars' && tx.categoria && tx.categoria !== 'meta_contribution') {
+              newState.gastos += monto;
+              if (newState.categories[tx.categoria] !== undefined) {
+                newState.categories[tx.categoria] += monto;
+              }
+            }
           }
         }
       });
@@ -234,7 +253,7 @@ export default function App() {
           />
           <StatCard 
             title="Balance Neto" 
-            value={Math.max(0, data.ingresos - data.gastos - data.ars)} 
+            value={Math.max(0, data.ingresos - data.gastos - data.ahorros_mes_ars)} 
             icon={<Wallet className="text-indigo-400" />} 
             color="indigo"
           />
