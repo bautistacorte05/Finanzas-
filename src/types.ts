@@ -1,4 +1,4 @@
-export type TransactionType = 'ingreso_mensual' | 'deposito_fondos' | 'gasto';
+export type TransactionType = 'ingreso_mensual' | 'deposito_fondos' | 'retiro_fondos' | 'gasto';
 export type Currency = 'ars' | 'usd';
 export type Category = 'alquiler' | 'comida' | 'entretenimiento' | 'transporte' | 'psicologa' | 'fernando' | 'meta_contribution';
 

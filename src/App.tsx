@@ -104,6 +104,11 @@ export default function App() {
           if (isCurrentMonth && tx.moneda === 'ars') {
             newState.ahorros_mes_ars += monto;
           }
+        } else if (tx.tipo === 'retiro_fondos') {
+          newState[tx.moneda] -= monto;
+          if (isCurrentMonth && tx.moneda === 'ars') {
+            newState.ahorros_mes_ars -= monto;
+          }
         }
 
         if (isCurrentMonth) {
@@ -381,6 +386,7 @@ export default function App() {
                     >
                       <option value="ingreso_mensual">Ingreso Mensual (KPI)</option>
                       <option value="deposito_fondos">Depósito en Fondos (Ahorro)</option>
+                      <option value="retiro_fondos">Retiro de Fondos / Cambio USD</option>
                       <option value="gasto">Gasto / Salida</option>
                     </select>
                   </div>
