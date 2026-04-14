@@ -4,45 +4,9 @@
 
 @layer base {
   body {
-    @apply bg-background text-slate-100 antialiased selection:bg-emerald-500/20 selection:text-emerald-400 overflow-x-hidden cursor-none;
+    @apply bg-background text-slate-100 antialiased selection:bg-emerald-500/20 selection:text-emerald-400 overflow-x-hidden;
     font-family: 'Inter', sans-serif;
   }
-}
-
-.mouse-spotlight {
-  background: radial-gradient(
-    600px circle at var(--mouse-x) var(--mouse-y),
-    rgba(16, 185, 129, 0.08),
-    transparent 80%
-  );
-  @apply fixed inset-0 pointer-events-none z-0 transition-opacity duration-300;
-}
-
-.custom-cursor {
-  @apply fixed w-5 h-5 bg-emerald-500/30 rounded-full pointer-events-none z-[999] backdrop-blur-sm border border-emerald-500/50 -translate-x-1/2 -translate-y-1/2 transition-transform duration-75 mix-blend-screen;
-}
-
-.custom-cursor-dot {
-  @apply fixed w-1.5 h-1.5 bg-emerald-400 rounded-full pointer-events-none z-[999] -translate-x-1/2 -translate-y-1/2;
-}
-
-.hover-glow {
-  position: relative;
-}
-
-.hover-glow::before {
-  content: "";
-  @apply absolute -inset-px opacity-0 transition-opacity duration-500 rounded-[inherit] pointer-events-none;
-  background: radial-gradient(
-    400px circle at var(--mouse-x) var(--mouse-y),
-    rgba(16, 185, 129, 0.4),
-    transparent 40%
-  );
-  z-index: 1;
-}
-
-.hover-glow:hover::before {
-  @apply opacity-100;
 }
 
 @layer components {
@@ -51,7 +15,7 @@
   }
 
   .premium-card {
-    @apply glass rounded-2xl p-6 transition-all duration-300 hover:border-emerald-500/30 hover:shadow-emerald-500/5 hover:-translate-y-1 hover-glow;
+    @apply glass rounded-2xl p-6 transition-all duration-300 hover:border-emerald-500/30 hover:shadow-emerald-500/5 hover:-translate-y-1;
   }
 
   .btn-primary {

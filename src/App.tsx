@@ -20,6 +20,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import Auth from './Auth';
+import MouseTrailCanvas from './components/MouseTrailCanvas';
 import type { Transaction, TransactionType, Currency, Category, Meta } from './types';
 
 // Utility for tailwind classes
@@ -58,29 +59,6 @@ export default function App() {
 
   const [history, setHistory] = useState<Transaction[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isHovering, setIsHovering] = useState(false);
-  const containerRef = React.useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (containerRef.current) {
-        containerRef.current.style.setProperty('--mouse-x', `${e.clientX}px`);
-        containerRef.current.style.setProperty('--mouse-y', `${e.clientY}px`);
-      }
-      
-      const target = e.target as HTMLElement;
-      setIsHovering(
-        target.tagName === 'BUTTON' || 
-        target.tagName === 'SELECT' || 
-        target.tagName === 'INPUT' || 
-        target.closest('button') !== null ||
-        target.closest('.premium-card') !== null
-      );
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
   const [pendingTx, setPendingTx] = useState({
     tipo: 'ingreso_mensual' as TransactionType,
     moneda: 'ars' as Currency,
@@ -228,22 +206,8 @@ export default function App() {
   }
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-background text-slate-100 p-6 md:p-12 relative overflow-hidden">
-      {/* Interactive Background & Cursor */}
-      <div className="mouse-spotlight" />
-      <motion.div 
-        className="custom-cursor"
-        animate={{ 
-          scale: isHovering ? 2.5 : 1,
-          backgroundColor: isHovering ? 'rgba(16, 185, 129, 0.1)' : 'rgba(16, 185, 129, 0.3)',
-          left: 0,
-          top: 0,
-          x: 'var(--mouse-x)',
-          y: 'var(--mouse-y)'
-        }}
-        transition={{ type: 'spring', damping: 25, stiffness: 200, mass: 0.5 }}
-      />
-      <div className="custom-cursor-dot" style={{ left: 'var(--mouse-x)', top: 'var(--mouse-y)' }} />
+    <div className="min-h-screen bg-background text-slate-100 p-6 md:p-12 relative overflow-hidden">
+      <MouseTrailCanvas />
 
       {/* Header */}
       <header className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6 relative z-10">
