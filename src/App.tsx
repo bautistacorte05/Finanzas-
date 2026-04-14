@@ -57,8 +57,30 @@ export default function App() {
   });
 
   const [history, setHistory] = useState<Transaction[]>([]);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (containerRef.current) {
+        containerRef.current.style.setProperty('--mouse-x', `${e.clientX}px`);
+        containerRef.current.style.setProperty('--mouse-y', `${e.clientY}px`);
+      }
+      
+      const target = e.target as HTMLElement;
+      setIsHovering(
+        target.tagName === 'BUTTON' || 
+        target.tagName === 'SELECT' || 
+        target.tagName === 'INPUT' || 
+        target.closest('button') !== null ||
+        target.closest('.premium-card') !== null
+      );
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
   const [pendingTx, setPendingTx] = useState({
     tipo: 'ingreso_mensual' as TransactionType,
     moneda: 'ars' as Currency,
@@ -206,9 +228,25 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-slate-100 p-6 md:p-12">
+    <div ref={containerRef} className="min-h-screen bg-background text-slate-100 p-6 md:p-12 relative overflow-hidden">
+      {/* Interactive Background & Cursor */}
+      <div className="mouse-spotlight" />
+      <motion.div 
+        className="custom-cursor"
+        animate={{ 
+          scale: isHovering ? 2.5 : 1,
+          backgroundColor: isHovering ? 'rgba(16, 185, 129, 0.1)' : 'rgba(16, 185, 129, 0.3)',
+          left: 0,
+          top: 0,
+          x: 'var(--mouse-x)',
+          y: 'var(--mouse-y)'
+        }}
+        transition={{ type: 'spring', damping: 25, stiffness: 200, mass: 0.5 }}
+      />
+      <div className="custom-cursor-dot" style={{ left: 'var(--mouse-x)', top: 'var(--mouse-y)' }} />
+
       {/* Header */}
-      <header className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
+      <header className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6 relative z-10">
         <div className="relative">
           <div className="absolute -top-4 -left-4 w-24 h-24 bg-emerald-500/10 blur-3xl rounded-full" />
           <h1 className="text-4xl font-black tracking-tight text-white relative">
@@ -240,7 +278,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto space-y-12">
+      <main className="max-w-6xl mx-auto space-y-12 relative z-10">
         {/* KPI Section */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <StatCard 
