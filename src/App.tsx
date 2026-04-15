@@ -6,19 +6,21 @@ import {
   TrendingDown, 
   Wallet, 
   X,
-  CreditCard,
   Home,
   Utensils,
   Play,
   Bus,
   Settings,
   Trash2,
-  LogOut
+  LogOut,
+  Brain,
+  User
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import Auth from './Auth';
+import MouseTrailCanvas from './components/MouseTrailCanvas';
 import type { Transaction, TransactionType, Currency, Category, Meta } from './types';
 
 // Utility for tailwind classes
@@ -34,6 +36,7 @@ export default function App() {
     usd: number;
     ingresos: number;
     gastos: number;
+    ahorros_mes_ars: number;
     categories: Record<Category, number>;
     metas: Meta[];
   }>({
@@ -41,19 +44,20 @@ export default function App() {
     usd: 0,
     ingresos: 0,
     gastos: 0,
+    ahorros_mes_ars: 0,
     categories: {
       alquiler: 0,
       comida: 0,
       entretenimiento: 0,
       transporte: 0,
-      suscripciones: 0,
+      psicologa: 0,
+      fernando: 0,
       meta_contribution: 0
     },
     metas: []
   });
 
   const [history, setHistory] = useState<Transaction[]>([]);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pendingTx, setPendingTx] = useState({
     tipo: 'ingreso_mensual' as TransactionType,
@@ -72,28 +76,51 @@ export default function App() {
       usd: 0,
       ingresos: 0,
       gastos: 0,
+      ahorros_mes_ars: 0,
       categories: {
         alquiler: 0,
         comida: 0,
         entretenimiento: 0,
         transporte: 0,
-        suscripciones: 0,
+        psicologa: 0,
+        fernando: 0,
         meta_contribution: 0
       },
       metas: (metas || []) as Meta[]
     };
 
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
     if (transactions) {
       transactions.forEach((tx: Transaction) => {
         const monto = Number(tx.monto);
-        if (tx.tipo === 'ingreso_mensual') {
-          if (tx.moneda === 'ars') newState.ingresos += monto;
-        } else if (tx.tipo === 'deposito_fondos') {
+        const txDate = new Date(tx.created_at);
+        const isCurrentMonth = txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear;
+
+        if (tx.tipo === 'deposito_fondos') {
           newState[tx.moneda] += monto;
-        } else if (tx.tipo === 'gasto') {
-          if (tx.moneda === 'ars' && tx.categoria && tx.categoria !== 'meta_contribution') {
-            newState.gastos += monto;
-            newState.categories[tx.categoria] += monto;
+          if (isCurrentMonth && tx.moneda === 'ars') {
+            newState.ahorros_mes_ars += monto;
+          }
+        } else if (tx.tipo === 'retiro_fondos') {
+          newState[tx.moneda] -= monto;
+          if (isCurrentMonth && tx.moneda === 'ars') {
+            newState.ahorros_mes_ars -= monto;
+          }
+        }
+
+        if (isCurrentMonth) {
+          if (tx.tipo === 'ingreso_mensual') {
+            if (tx.moneda === 'ars') newState.ingresos += monto;
+          } else if (tx.tipo === 'gasto') {
+            if (tx.moneda === 'ars' && tx.categoria && tx.categoria !== 'meta_contribution') {
+              newState.gastos += monto;
+              if (newState.categories[tx.categoria] !== undefined) {
+                newState.categories[tx.categoria] += monto;
+              }
+            }
           }
         }
       });
@@ -179,9 +206,11 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-slate-100 p-6 md:p-12">
+    <div className="min-h-screen bg-background text-slate-100 p-6 md:p-12 relative overflow-hidden">
+      <MouseTrailCanvas />
+
       {/* Header */}
-      <header className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
+      <header className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6 relative z-10">
         <div className="relative">
           <div className="absolute -top-4 -left-4 w-24 h-24 bg-emerald-500/10 blur-3xl rounded-full" />
           <h1 className="text-4xl font-black tracking-tight text-white relative">
@@ -213,7 +242,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto space-y-12">
+      <main className="max-w-6xl mx-auto space-y-12 relative z-10">
         {/* KPI Section */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <StatCard 
@@ -231,7 +260,7 @@ export default function App() {
           />
           <StatCard 
             title="Balance Neto" 
-            value={Math.max(0, data.ingresos - data.gastos)} 
+            value={Math.max(0, data.ingresos - data.gastos - data.ahorros_mes_ars)} 
             icon={<Wallet className="text-indigo-400" />} 
             color="indigo"
           />
@@ -263,12 +292,13 @@ export default function App() {
                 <h3 className="text-xl font-bold">Desglose de Gastos (ARS)</h3>
                 <Settings size={18} className="text-slate-500 cursor-pointer hover:text-white transition-colors" />
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-center">
                  <CategoryItem icon={<Home />} label="Alquiler" value={data.categories.alquiler} />
                  <CategoryItem icon={<Utensils />} label="Comida" value={data.categories.comida} />
                  <CategoryItem icon={<Play />} label="Ocio" value={data.categories.entretenimiento} />
                  <CategoryItem icon={<Bus />} label="Viajes" value={data.categories.transporte} />
-                 <CategoryItem icon={<CreditCard />} label="Apps" value={data.categories.suscripciones} />
+                 <CategoryItem icon={<Brain />} label="Psicóloga" value={data.categories.psicologa} />
+                 <CategoryItem icon={<User />} label="Fernando" value={data.categories.fernando} />
               </div>
            </div>
         </section>
@@ -358,6 +388,7 @@ export default function App() {
                     >
                       <option value="ingreso_mensual">Ingreso Mensual (KPI)</option>
                       <option value="deposito_fondos">Depósito en Fondos (Ahorro)</option>
+                      <option value="retiro_fondos">Retiro de Fondos / Cambio USD</option>
                       <option value="gasto">Gasto / Salida</option>
                     </select>
                   </div>
@@ -387,7 +418,8 @@ export default function App() {
                         <option value="comida">Comida</option>
                         <option value="entretenimiento">Ocio</option>
                         <option value="transporte">Viajes</option>
-                        <option value="suscripciones">Suscripciones</option>
+                        <option value="psicologa">Psicóloga</option>
+                        <option value="fernando">Fernando</option>
                       </select>
                     </div>
                   )}

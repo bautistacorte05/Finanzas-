@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-background text-slate-100 antialiased selection:bg-emerald-500/20 selection:text-emerald-400;
+    @apply bg-background text-slate-100 antialiased selection:bg-emerald-500/20 selection:text-emerald-400 overflow-x-hidden;
     font-family: 'Inter', sans-serif;
     /* Custom dot cursor – replaces the default arrow inside the app */
     cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Ccircle cx='10' cy='10' r='4' fill='%2334d399'/%3E%3Ccircle cx='10' cy='10' r='9' stroke='%2334d39966' stroke-width='1.5' fill='none'/%3E%3C/svg%3E") 10 10, auto;
@@ -24,7 +24,7 @@
   }
 
   .premium-card {
-    @apply glass rounded-2xl p-6 transition-all duration-300 hover:border-emerald-500/20 hover:shadow-emerald-500/10;
+    @apply glass rounded-2xl p-6 transition-all duration-300 hover:border-emerald-500/30 hover:shadow-emerald-500/5 hover:-translate-y-1;
   }
 
   .btn-primary {
