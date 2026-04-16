@@ -260,7 +260,7 @@ export default function App() {
           />
           <StatCard 
             title="Balance Neto" 
-            value={Math.max(0, data.ingresos - data.gastos - data.ahorros_mes_ars)} 
+            value={data.ingresos - data.gastos} 
             icon={<Wallet className="text-indigo-400" />} 
             color="indigo"
           />
@@ -457,6 +457,9 @@ export default function App() {
 function StatCard({ title, value, icon, color, isNegative }: { 
   title: string, value: number, icon: React.ReactNode, color: string, isNegative?: boolean 
 }) {
+  const isActualNegative = isNegative || value < 0;
+  const absValue = Math.abs(value);
+
   return (
     <motion.div 
       whileHover={{ y: -4 }}
@@ -464,7 +467,7 @@ function StatCard({ title, value, icon, color, isNegative }: {
     >
       <div className={cn(
         "absolute -top-12 -right-12 w-32 h-32 blur-3xl opacity-20 rounded-full",
-        color === 'emerald' ? 'bg-emerald-500' : color === 'rose' ? 'bg-rose-500' : 'bg-indigo-500'
+        isActualNegative ? 'bg-rose-500' : (color === 'emerald' ? 'bg-emerald-500' : 'bg-indigo-500')
       )} />
       <div className="flex justify-between items-start mb-6">
         <span className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">{title}</span>
@@ -472,9 +475,9 @@ function StatCard({ title, value, icon, color, isNegative }: {
       </div>
       <div className={cn(
         "text-3xl font-black tracking-tight",
-        isNegative ? "text-rose-400" : "text-white"
+        isActualNegative ? "text-rose-400" : "text-white"
       )}>
-        {isNegative ? '-' : '+'}${value.toLocaleString('es-AR')}
+        {isActualNegative ? '-' : '+'}${absValue.toLocaleString('es-AR')}
       </div>
       <div className="mt-2 text-[10px] text-slate-500 font-bold uppercase tracking-widest">
         Actualizado en tiempo real
