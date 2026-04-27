@@ -35,8 +35,14 @@ export default function App() {
     const stored = localStorage.getItem('balanceOffset');
     return stored ? Number(stored) : 0;
   });
+  const [ingresosOffset, setIngresosOffset] = useState<number>(() => {
+    const stored = localStorage.getItem('ingresosOffset');
+    return stored ? Number(stored) : 0;
+  });
   const [editingBalance, setEditingBalance] = useState(false);
   const [balanceInput, setBalanceInput] = useState('');
+  const [editingIngresos, setEditingIngresos] = useState(false);
+  const [ingresosInput, setIngresosInput] = useState('');
   const [data, setData] = useState<{
     ars: number;
     usd: number;
@@ -77,6 +83,13 @@ export default function App() {
     setBalanceOffset(offset);
     localStorage.setItem('balanceOffset', String(offset));
     setEditingBalance(false);
+  };
+
+  const handleSetIngresos = (desiredIngresos: number) => {
+    const offset = desiredIngresos - data.ingresos;
+    setIngresosOffset(offset);
+    localStorage.setItem('ingresosOffset', String(offset));
+    setEditingIngresos(false);
   };
 
   const fetchData = async () => {
@@ -258,44 +271,37 @@ export default function App() {
       <main className="max-w-6xl mx-auto space-y-12 relative z-10">
         {/* KPI Section */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <StatCard 
-            title="Ingresos" 
-            value={data.ingresos} 
-            icon={<TrendingUp className="text-emerald-400" />} 
+          <EditableStatCard
+            title="Ingresos"
+            value={data.ingresos + ingresosOffset}
+            icon={<TrendingUp className="text-emerald-400" />}
             color="emerald"
+            editing={editingIngresos}
+            inputValue={ingresosInput}
+            onStartEdit={() => { setIngresosInput(String(data.ingresos + ingresosOffset)); setEditingIngresos(true); }}
+            onInputChange={setIngresosInput}
+            onConfirm={() => handleSetIngresos(Number(ingresosInput))}
+            onCancel={() => setEditingIngresos(false)}
           />
-          <StatCard 
-            title="Gastos Totales" 
-            value={data.gastos} 
-            icon={<TrendingDown className="text-rose-400" />} 
+          <StatCard
+            title="Gastos Totales"
+            value={data.gastos}
+            icon={<TrendingDown className="text-rose-400" />}
             color="rose"
             isNegative
           />
-          <motion.div whileHover={{ y: -4 }} className="premium-card relative overflow-hidden cursor-pointer" onClick={() => { setBalanceInput(String(data.ingresos - data.gastos + balanceOffset)); setEditingBalance(true); }}>
-            <div className="absolute -top-12 -right-12 w-32 h-32 blur-3xl opacity-20 rounded-full bg-indigo-500" />
-            <div className="flex justify-between items-start mb-6">
-              <span className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Balance Neto</span>
-              <div className="bg-white/5 p-2 rounded-lg"><Wallet className="text-indigo-400" /></div>
-            </div>
-            {editingBalance ? (
-              <div className="flex gap-2" onClick={e => e.stopPropagation()}>
-                <input
-                  autoFocus
-                  type="number"
-                  value={balanceInput}
-                  onChange={e => setBalanceInput(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter') handleSetBalance(Number(balanceInput)); if (e.key === 'Escape') setEditingBalance(false); }}
-                  className="w-full bg-slate-800 rounded-xl px-3 py-2 text-2xl font-black focus:ring-2 focus:ring-indigo-500 outline-none"
-                />
-                <button onClick={() => handleSetBalance(Number(balanceInput))} className="px-3 py-2 bg-indigo-500 rounded-xl text-xs font-black">OK</button>
-              </div>
-            ) : (
-              <div className={cn("text-3xl font-black tracking-tight", (data.ingresos - data.gastos + balanceOffset) < 0 ? "text-rose-400" : "text-white")}>
-                {(data.ingresos - data.gastos + balanceOffset) < 0 ? '-' : '+'}${Math.abs(data.ingresos - data.gastos + balanceOffset).toLocaleString('es-AR')}
-              </div>
-            )}
-            <div className="mt-2 text-[10px] text-slate-500 font-bold uppercase tracking-widest">Click para editar</div>
-          </motion.div>
+          <EditableStatCard
+            title="Balance Neto"
+            value={data.ingresos + ingresosOffset - data.gastos + balanceOffset}
+            icon={<Wallet className="text-indigo-400" />}
+            color="indigo"
+            editing={editingBalance}
+            inputValue={balanceInput}
+            onStartEdit={() => { setBalanceInput(String(data.ingresos + ingresosOffset - data.gastos + balanceOffset)); setEditingBalance(true); }}
+            onInputChange={setBalanceInput}
+            onConfirm={() => handleSetBalance(Number(balanceInput))}
+            onCancel={() => setEditingBalance(false)}
+          />
         </section>
 
         {/* Currency Portfolio */}
@@ -486,8 +492,45 @@ export default function App() {
   );
 }
 
-function StatCard({ title, value, icon, color, isNegative }: { 
-  title: string, value: number, icon: React.ReactNode, color: string, isNegative?: boolean 
+function EditableStatCard({ title, value, icon, color, editing, inputValue, onStartEdit, onInputChange, onConfirm, onCancel }: {
+  title: string, value: number, icon: React.ReactNode, color: string,
+  editing: boolean, inputValue: string,
+  onStartEdit: () => void, onInputChange: (v: string) => void, onConfirm: () => void, onCancel: () => void
+}) {
+  const bgColor = color === 'emerald' ? 'bg-emerald-500' : color === 'rose' ? 'bg-rose-500' : 'bg-indigo-500';
+  const ringColor = color === 'emerald' ? 'focus:ring-emerald-500' : color === 'rose' ? 'focus:ring-rose-500' : 'focus:ring-indigo-500';
+  const btnColor = color === 'emerald' ? 'bg-emerald-500' : color === 'rose' ? 'bg-rose-500' : 'bg-indigo-500';
+  return (
+    <motion.div whileHover={{ y: -4 }} className="premium-card relative overflow-hidden cursor-pointer" onClick={onStartEdit}>
+      <div className={cn("absolute -top-12 -right-12 w-32 h-32 blur-3xl opacity-20 rounded-full", bgColor)} />
+      <div className="flex justify-between items-start mb-6">
+        <span className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">{title}</span>
+        <div className="bg-white/5 p-2 rounded-lg">{icon}</div>
+      </div>
+      {editing ? (
+        <div className="flex gap-2" onClick={e => e.stopPropagation()}>
+          <input
+            autoFocus
+            type="number"
+            value={inputValue}
+            onChange={e => onInputChange(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') onConfirm(); if (e.key === 'Escape') onCancel(); }}
+            className={cn("w-full bg-slate-800 rounded-xl px-3 py-2 text-2xl font-black focus:ring-2 outline-none", ringColor)}
+          />
+          <button onClick={onConfirm} className={cn("px-3 py-2 rounded-xl text-xs font-black", btnColor)}>OK</button>
+        </div>
+      ) : (
+        <div className={cn("text-3xl font-black tracking-tight", value < 0 ? "text-rose-400" : "text-white")}>
+          {value < 0 ? '-' : '+'}${Math.abs(value).toLocaleString('es-AR')}
+        </div>
+      )}
+      <div className="mt-2 text-[10px] text-slate-500 font-bold uppercase tracking-widest">Click para editar</div>
+    </motion.div>
+  );
+}
+
+function StatCard({ title, value, icon, color, isNegative }: {
+  title: string, value: number, icon: React.ReactNode, color: string, isNegative?: boolean
 }) {
   const isActualNegative = isNegative || value < 0;
   const absValue = Math.abs(value);
