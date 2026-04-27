@@ -31,6 +31,12 @@ function cn(...inputs: ClassValue[]) {
 export default function App() {
   const [loading, setLoading] = useState(true);
   const [session, setSession] = useState<any>(null);
+  const [balanceOffset, setBalanceOffset] = useState<number>(() => {
+    const stored = localStorage.getItem('balanceOffset');
+    return stored ? Number(stored) : 0;
+  });
+  const [editingBalance, setEditingBalance] = useState(false);
+  const [balanceInput, setBalanceInput] = useState('');
   const [data, setData] = useState<{
     ars: number;
     usd: number;
@@ -65,6 +71,13 @@ export default function App() {
     monto: '',
     categoria: 'alquiler' as Category
   });
+
+  const handleSetBalance = (desiredBalance: number) => {
+    const offset = desiredBalance - (data.ingresos - data.gastos);
+    setBalanceOffset(offset);
+    localStorage.setItem('balanceOffset', String(offset));
+    setEditingBalance(false);
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -258,12 +271,31 @@ export default function App() {
             color="rose"
             isNegative
           />
-          <StatCard 
-            title="Balance Neto" 
-            value={data.ingresos - data.gastos} 
-            icon={<Wallet className="text-indigo-400" />} 
-            color="indigo"
-          />
+          <motion.div whileHover={{ y: -4 }} className="premium-card relative overflow-hidden cursor-pointer" onClick={() => { setBalanceInput(String(data.ingresos - data.gastos + balanceOffset)); setEditingBalance(true); }}>
+            <div className="absolute -top-12 -right-12 w-32 h-32 blur-3xl opacity-20 rounded-full bg-indigo-500" />
+            <div className="flex justify-between items-start mb-6">
+              <span className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Balance Neto</span>
+              <div className="bg-white/5 p-2 rounded-lg"><Wallet className="text-indigo-400" /></div>
+            </div>
+            {editingBalance ? (
+              <div className="flex gap-2" onClick={e => e.stopPropagation()}>
+                <input
+                  autoFocus
+                  type="number"
+                  value={balanceInput}
+                  onChange={e => setBalanceInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') handleSetBalance(Number(balanceInput)); if (e.key === 'Escape') setEditingBalance(false); }}
+                  className="w-full bg-slate-800 rounded-xl px-3 py-2 text-2xl font-black focus:ring-2 focus:ring-indigo-500 outline-none"
+                />
+                <button onClick={() => handleSetBalance(Number(balanceInput))} className="px-3 py-2 bg-indigo-500 rounded-xl text-xs font-black">OK</button>
+              </div>
+            ) : (
+              <div className={cn("text-3xl font-black tracking-tight", (data.ingresos - data.gastos + balanceOffset) < 0 ? "text-rose-400" : "text-white")}>
+                {(data.ingresos - data.gastos + balanceOffset) < 0 ? '-' : '+'}${Math.abs(data.ingresos - data.gastos + balanceOffset).toLocaleString('es-AR')}
+              </div>
+            )}
+            <div className="mt-2 text-[10px] text-slate-500 font-bold uppercase tracking-widest">Click para editar</div>
+          </motion.div>
         </section>
 
         {/* Currency Portfolio */}
