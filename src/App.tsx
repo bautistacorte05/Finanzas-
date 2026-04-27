@@ -114,6 +114,7 @@ export default function App() {
         crunchyroll: 0,
         tuenti: 0,
         apple: 0,
+        futbol: 0,
         transporte: 0,
         psicologa: 0,
         fernando: 0,
