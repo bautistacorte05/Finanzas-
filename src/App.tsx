@@ -333,7 +333,7 @@ export default function App() {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-center">
                  <CategoryItem icon={<Home />} label="Alquiler" value={data.categories.alquiler} />
                  <CategoryItem icon={<Utensils />} label="Comida" value={data.categories.comida} />
-                 <CategoryItem icon={<Play />} label="Ocio" value={data.categories.entretenimiento} />
+                 <CategoryItem icon={<Play />} label="Subs Mensuales" value={data.categories.entretenimiento} />
                  <CategoryItem icon={<Bus />} label="Viajes" value={data.categories.transporte} />
                  <CategoryItem icon={<Brain />} label="Psicóloga" value={data.categories.psicologa} />
                  <CategoryItem icon={<User />} label="Fernando" value={data.categories.fernando} />
@@ -454,7 +454,7 @@ export default function App() {
                       >
                         <option value="alquiler">Alquiler</option>
                         <option value="comida">Comida</option>
-                        <option value="entretenimiento">Ocio</option>
+                        <option value="entretenimiento">Subs Mensuales</option>
                         <option value="transporte">Viajes</option>
                         <option value="psicologa">Psicóloga</option>
                         <option value="fernando">Fernando</option>
