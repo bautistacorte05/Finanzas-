@@ -1,6 +1,6 @@
 export type TransactionType = 'ingreso_mensual' | 'deposito_fondos' | 'retiro_fondos' | 'gasto';
 export type Currency = 'ars' | 'usd';
-export type Category = 'alquiler' | 'comida' | 'claude_code' | 'crunchyroll' | 'tuenti' | 'apple' | 'transporte' | 'psicologa' | 'fernando' | 'meta_contribution';
+export type Category = 'alquiler' | 'comida' | 'claude_code' | 'crunchyroll' | 'tuenti' | 'apple' | 'futbol' | 'transporte' | 'psicologa' | 'fernando' | 'meta_contribution';
 
 export interface Transaction {
   id: string;

@@ -64,6 +64,7 @@ export default function App() {
       crunchyroll: 0,
       tuenti: 0,
       apple: 0,
+      futbol: 0,
       transporte: 0,
       psicologa: 0,
       fernando: 0,
@@ -343,6 +344,7 @@ export default function App() {
                  <CategoryItem icon={<Play />} label="CrunchyRoll" value={data.categories.crunchyroll} />
                  <CategoryItem icon={<Play />} label="Tuenti" value={data.categories.tuenti} />
                  <CategoryItem icon={<Play />} label="Apple" value={data.categories.apple} />
+                 <CategoryItem icon={<Play />} label="Fútbol" value={data.categories.futbol} />
                  <CategoryItem icon={<Bus />} label="Viajes" value={data.categories.transporte} />
                  <CategoryItem icon={<Brain />} label="Psicóloga" value={data.categories.psicologa} />
                  <CategoryItem icon={<User />} label="Fernando" value={data.categories.fernando} />
@@ -467,6 +469,7 @@ export default function App() {
                         <option value="crunchyroll">CrunchyRoll</option>
                         <option value="tuenti">Tuenti</option>
                         <option value="apple">Apple</option>
+                        <option value="futbol">Fútbol</option>
                         <option value="transporte">Viajes</option>
                         <option value="psicologa">Psicóloga</option>
                         <option value="fernando">Fernando</option>
