@@ -60,7 +60,10 @@ export default function App() {
     categories: {
       alquiler: 0,
       comida: 0,
-      entretenimiento: 0,
+      claude_code: 0,
+      crunchyroll: 0,
+      tuenti: 0,
+      apple: 0,
       transporte: 0,
       psicologa: 0,
       fernando: 0,
@@ -106,7 +109,10 @@ export default function App() {
       categories: {
         alquiler: 0,
         comida: 0,
-        entretenimiento: 0,
+        claude_code: 0,
+        crunchyroll: 0,
+        tuenti: 0,
+        apple: 0,
         transporte: 0,
         psicologa: 0,
         fernando: 0,
@@ -333,7 +339,10 @@ export default function App() {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-center">
                  <CategoryItem icon={<Home />} label="Alquiler" value={data.categories.alquiler} />
                  <CategoryItem icon={<Utensils />} label="Comida" value={data.categories.comida} />
-                 <CategoryItem icon={<Play />} label="Subs Mensuales" value={data.categories.entretenimiento} />
+                 <CategoryItem icon={<Play />} label="Claude Code" value={data.categories.claude_code} />
+                 <CategoryItem icon={<Play />} label="CrunchyRoll" value={data.categories.crunchyroll} />
+                 <CategoryItem icon={<Play />} label="Tuenti" value={data.categories.tuenti} />
+                 <CategoryItem icon={<Play />} label="Apple" value={data.categories.apple} />
                  <CategoryItem icon={<Bus />} label="Viajes" value={data.categories.transporte} />
                  <CategoryItem icon={<Brain />} label="Psicóloga" value={data.categories.psicologa} />
                  <CategoryItem icon={<User />} label="Fernando" value={data.categories.fernando} />
@@ -454,7 +463,10 @@ export default function App() {
                       >
                         <option value="alquiler">Alquiler</option>
                         <option value="comida">Comida</option>
-                        <option value="entretenimiento">Subs Mensuales</option>
+                        <option value="claude_code">Claude Code</option>
+                        <option value="crunchyroll">CrunchyRoll</option>
+                        <option value="tuenti">Tuenti</option>
+                        <option value="apple">Apple</option>
                         <option value="transporte">Viajes</option>
                         <option value="psicologa">Psicóloga</option>
                         <option value="fernando">Fernando</option>
