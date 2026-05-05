@@ -8,14 +8,16 @@ import {
   X,
   Home,
   Utensils,
-  Play,
   Bus,
   Settings,
   Trash2,
   LogOut,
   Brain,
   User,
-  ChevronDown
+  ChevronDown,
+  Guitar,
+  Smartphone,
+  Play
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
@@ -352,15 +354,15 @@ export default function App() {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-center">
                  <CategoryItem icon={<Home />} label="Alquiler" value={data.categories.alquiler} />
                  <CategoryItem icon={<Utensils />} label="Comida" value={data.categories.comida} />
-                 <CategoryItem icon={<Play />} label="Claude Code" value={data.categories.claude_code} />
+                 <CategoryItem icon={<ClaudeLogoIcon size={18} />} label="Claude Code" value={data.categories.claude_code} />
                  <CategoryItem icon={<Play />} label="CrunchyRoll" value={data.categories.crunchyroll} />
-                 <CategoryItem icon={<Play />} label="Tuenti" value={data.categories.tuenti} />
-                 <CategoryItem icon={<Play />} label="Apple" value={data.categories.apple} />
-                 <CategoryItem icon={<Play />} label="Fútbol" value={data.categories.futbol} />
+                 <CategoryItem icon={<Smartphone size={18} />} label="Tuenti" value={data.categories.tuenti} />
+                 <CategoryItem icon={<Smartphone size={18} />} label="Apple" value={data.categories.apple} />
+                 <CategoryItem icon={<SoccerBallIcon size={18} />} label="Fútbol" value={data.categories.futbol} />
                  <CategoryItem icon={<Bus />} label="Viajes" value={data.categories.transporte} />
                  <CategoryItem icon={<Brain />} label="Psicóloga" value={data.categories.psicologa} />
                  <CategoryItem icon={<User />} label="Fernando" value={data.categories.fernando} />
-                 <CategoryItem icon={<Play />} label="Rock and Roll" value={data.categories.rock_and_roll} />
+                 <CategoryItem icon={<Guitar size={18} />} label="Rock and Roll" value={data.categories.rock_and_roll} />
               </div>
            </div>
         </section>
@@ -656,6 +658,29 @@ function TxItem({ tx, onDelete }: { tx: Transaction; onDelete: (id: string, e: R
         </button>
       </div>
     </div>
+  );
+}
+
+function SoccerBallIcon({ size = 24 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <polygon points="12,7.5 14.6,9.5 13.6,12.5 10.4,12.5 9.4,9.5" />
+      <line x1="12" y1="2" x2="12" y2="7.5" />
+      <line x1="20.6" y1="7.5" x2="14.6" y2="9.5" />
+      <line x1="17.5" y1="18.5" x2="13.6" y2="12.5" />
+      <line x1="6.5" y1="18.5" x2="10.4" y2="12.5" />
+      <line x1="3.4" y1="7.5" x2="9.4" y2="9.5" />
+    </svg>
+  );
+}
+
+function ClaudeLogoIcon({ size = 24 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 19 L12 5 L18 19" />
+      <path d="M9 13 L15 13" />
+    </svg>
   );
 }
 
