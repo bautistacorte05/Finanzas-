@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from './lib/supabase';
 import { 
-  Plus, 
-  TrendingUp, 
-  TrendingDown, 
-  Wallet, 
+  Plus,
+  TrendingUp,
+  TrendingDown,
+  Wallet,
   X,
   Home,
   Utensils,
@@ -14,7 +14,8 @@ import {
   Trash2,
   LogOut,
   Brain,
-  User
+  User,
+  ChevronDown
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
@@ -75,6 +76,7 @@ export default function App() {
   });
 
   const [history, setHistory] = useState<Transaction[]>([]);
+  const [prevMonthOpen, setPrevMonthOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pendingTx, setPendingTx] = useState({
     tipo: 'ingreso_mensual' as TransactionType,
@@ -241,6 +243,13 @@ export default function App() {
     );
   }
 
+  const _now = new Date();
+  const _cm = _now.getMonth(), _cy = _now.getFullYear();
+  const _pm = _cm === 0 ? 11 : _cm - 1, _py = _cm === 0 ? _cy - 1 : _cy;
+  const currentMonthTxs = history.filter(tx => { const d = new Date(tx.created_at); return d.getMonth() === _cm && d.getFullYear() === _cy; });
+  const prevMonthTxs    = history.filter(tx => { const d = new Date(tx.created_at); return d.getMonth() === _pm && d.getFullYear() === _py; });
+  const prevMonthLabel  = new Date(_py, _pm).toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
+
   return (
     <div className="min-h-screen bg-background text-slate-100 p-6 md:p-12 relative overflow-hidden">
       <MouseTrailCanvas />
@@ -360,49 +369,52 @@ export default function App() {
         <section className="premium-card">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-xl font-bold">Historial de Movimientos</h3>
-            <span className="text-xs font-bold uppercase tracking-widest text-slate-500">{history.length} Registros</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-slate-500">{currentMonthTxs.length} Registros</span>
           </div>
-          
+
+          {/* Mes actual */}
           <div className="space-y-3">
-            {history.length === 0 ? (
-              <p className="text-center text-slate-500 py-6 text-sm">No hay movimientos recientes.</p>
+            {currentMonthTxs.length === 0 ? (
+              <p className="text-center text-slate-500 py-6 text-sm">No hay movimientos este mes.</p>
             ) : (
-              history.map((tx) => (
-                <div key={tx.id} className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group">
-                  <div className="flex items-center gap-4">
-                     <div className={cn(
-                       "w-10 h-10 rounded-full flex items-center justify-center",
-                       tx.tipo === 'ingreso_mensual' || tx.tipo === 'deposito_fondos' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'
-                     )}>
-                       {tx.tipo === 'ingreso_mensual' || tx.tipo === 'deposito_fondos' ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
-                     </div>
-                     <div>
-                       <div className="font-bold text-sm uppercase tracking-wide">
-                         {tx.tipo.replace('_', ' ')}
-                         {tx.categoria && <span className="text-slate-400 ml-2 text-xs">({tx.categoria})</span>}
-                       </div>
-                       <div className="text-xs text-slate-500">{new Date(tx.created_at).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</div>
-                     </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className={cn(
-                      "font-black text-lg",
-                      tx.tipo === 'ingreso_mensual' || tx.tipo === 'deposito_fondos' ? "text-emerald-400" : "text-rose-400"
-                    )}>
-                      {tx.tipo === 'ingreso_mensual' || tx.tipo === 'deposito_fondos' ? '+' : '-'}${Number(tx.monto).toLocaleString('es-AR')} <span className="text-xs">{tx.moneda.toUpperCase()}</span>
-                    </div>
-                    <button 
-                      onClick={(e) => handleDelete(tx.id, e)}
-                      className="text-slate-500 hover:text-rose-400 bg-black/20 p-2 rounded-xl opacity-0 group-hover:opacity-100 transition-all active:scale-95"
-                      title="Eliminar registro"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
+              currentMonthTxs.map((tx) => (
+                <TxItem key={tx.id} tx={tx} onDelete={handleDelete} />
               ))
             )}
           </div>
+
+          {/* Mes anterior colapsable */}
+          {prevMonthTxs.length > 0 && (
+            <div className="mt-4 border-t border-white/5 pt-4">
+              <button
+                onClick={() => setPrevMonthOpen(o => !o)}
+                className="w-full flex items-center justify-between p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors text-left"
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="font-bold text-sm capitalize truncate">{prevMonthLabel}</span>
+                  <span className="text-slate-500 text-xs shrink-0">— {prevMonthTxs.length} movimientos</span>
+                </div>
+                <ChevronDown size={16} className={cn("text-slate-400 transition-transform shrink-0 ml-2", prevMonthOpen && "rotate-180")} />
+              </button>
+              <AnimatePresence>
+                {prevMonthOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="space-y-3 pt-3">
+                      {prevMonthTxs.map((tx) => (
+                        <TxItem key={tx.id} tx={tx} onDelete={handleDelete} />
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
         </section>
       </main>
 
@@ -611,6 +623,38 @@ function WalletCard({ currency, symbol, value, color, onAction }: {
       >
         Gestionar Fondos {symbol}
       </button>
+    </div>
+  );
+}
+
+function TxItem({ tx, onDelete }: { tx: Transaction; onDelete: (id: string, e: React.MouseEvent) => void }) {
+  const isIncome = tx.tipo === 'ingreso_mensual' || tx.tipo === 'deposito_fondos';
+  return (
+    <div className="flex items-center justify-between p-3 sm:p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group gap-2">
+      <div className="flex items-center gap-3 min-w-0">
+        <div className={cn("w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0", isIncome ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400')}>
+          {isIncome ? <TrendingUp size={15} /> : <TrendingDown size={15} />}
+        </div>
+        <div className="min-w-0">
+          <div className="font-bold text-xs sm:text-sm uppercase tracking-wide truncate">
+            {tx.tipo.replace(/_/g, ' ')}
+            {tx.categoria && <span className="text-slate-400 ml-1 text-xs normal-case">({tx.categoria})</span>}
+          </div>
+          <div className="text-xs text-slate-500">{new Date(tx.created_at).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</div>
+        </div>
+      </div>
+      <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+        <div className={cn("font-black text-base sm:text-lg", isIncome ? "text-emerald-400" : "text-rose-400")}>
+          {isIncome ? '+' : '-'}${Number(tx.monto).toLocaleString('es-AR')} <span className="text-xs">{tx.moneda.toUpperCase()}</span>
+        </div>
+        <button
+          onClick={(e) => onDelete(tx.id, e)}
+          className="text-slate-500 hover:text-rose-400 bg-black/20 p-2 rounded-xl opacity-0 group-hover:opacity-100 transition-all active:scale-95"
+          title="Eliminar registro"
+        >
+          <Trash2 size={15} />
+        </button>
+      </div>
     </div>
   );
 }
