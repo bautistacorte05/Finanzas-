@@ -17,7 +17,7 @@ import {
   ChevronDown,
   Guitar,
   Smartphone,
-  Play
+  Heart
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
@@ -355,7 +355,7 @@ export default function App() {
                  <CategoryItem icon={<Home />} label="Alquiler" value={data.categories.alquiler} />
                  <CategoryItem icon={<Utensils />} label="Comida" value={data.categories.comida} />
                  <CategoryItem icon={<ClaudeLogoIcon size={18} />} label="Claude Code" value={data.categories.claude_code} />
-                 <CategoryItem icon={<Play />} label="CrunchyRoll" value={data.categories.crunchyroll} />
+                 <CategoryItem icon={<Heart />} label="Lu" value={data.categories.crunchyroll} />
                  <CategoryItem icon={<Smartphone size={18} />} label="Tuenti" value={data.categories.tuenti} />
                  <CategoryItem icon={<Smartphone size={18} />} label="Apple" value={data.categories.apple} />
                  <CategoryItem icon={<SoccerBallIcon size={18} />} label="Fútbol" value={data.categories.futbol} />
@@ -484,7 +484,7 @@ export default function App() {
                         <option value="alquiler">Alquiler</option>
                         <option value="comida">Comida</option>
                         <option value="claude_code">Claude Code</option>
-                        <option value="crunchyroll">CrunchyRoll</option>
+                        <option value="crunchyroll">Lu</option>
                         <option value="tuenti">Tuenti</option>
                         <option value="apple">Apple</option>
                         <option value="futbol">Fútbol</option>
