@@ -477,6 +477,7 @@ export default function App() {
                         <option value="transporte">Viajes</option>
                         <option value="psicologa">Psicóloga</option>
                         <option value="fernando">Fernando</option>
+                        <option value="rock_and_roll">Rock and Roll</option>
                       </select>
                     </div>
                   )}
