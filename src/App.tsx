@@ -68,6 +68,7 @@ export default function App() {
       transporte: 0,
       psicologa: 0,
       fernando: 0,
+      rock_and_roll: 0,
       meta_contribution: 0
     },
     metas: []
@@ -118,6 +119,7 @@ export default function App() {
         transporte: 0,
         psicologa: 0,
         fernando: 0,
+        rock_and_roll: 0,
         meta_contribution: 0
       },
       metas: (metas || []) as Meta[]
@@ -349,6 +351,7 @@ export default function App() {
                  <CategoryItem icon={<Bus />} label="Viajes" value={data.categories.transporte} />
                  <CategoryItem icon={<Brain />} label="Psicóloga" value={data.categories.psicologa} />
                  <CategoryItem icon={<User />} label="Fernando" value={data.categories.fernando} />
+                 <CategoryItem icon={<Play />} label="Rock and Roll" value={data.categories.rock_and_roll} />
               </div>
            </div>
         </section>
