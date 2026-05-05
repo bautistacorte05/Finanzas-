@@ -13,6 +13,8 @@ export default function MouseTrailCanvas() {
   const mouseRef  = useRef({ x: -999, y: -999 });
 
   useEffect(() => {
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
